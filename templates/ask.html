@@ -27,13 +27,13 @@
                     <button class="btn btn-outline-success rounded-0" type="submit">ASK!</button>
                 </form>
 
-
-                <!-- <div class="d-flex gap-3 me-5">
+                <div class="d-flex gap-3 me-5">
                     <a href="#">log in</a>
                     <a href="#">register</a>
-                </div> -->
+                </div>
 
-                <div class="d-flex gap-2 align-items-center pe-3">
+
+                <!-- <div class="d-flex gap-2 align-items-center pe-3">
                     <img src="../static/img/200img.png" alt="avatar" height="50">
                     <div class="d-flex flex-column">
                         <div>Dr. pepper</div>
@@ -42,14 +42,66 @@
                             <a href="#">log out</a>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </nav>
 
     <main class="container-fluid mt-3 w-100 pe-4 ps-4">
+        <h1>New Question</h1>
+
         <div class="row">
-            <div class="col-9 d-flex flex-column gap-4">
+            <div class="col-9">
+                <form class="d-flex flex-column gap-4">
+                    <div class="row">
+                        <div class="col-2 mt-2">
+                            <span>Title</span>
+                        </div>
+                        <div class="col-10">
+                            <div class="form-floating">
+                                <textarea class="form-control is-invalid" id="floatingTextarea2"
+                                    style="height: 50px; max-height: 100px;" required placeholder=""></textarea>
+                                <label for="floatingTextarea2">Title:</label>
+                                <div class="invalid-feedback">
+                                    Error!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 mt-2">
+                            <span>
+                                Text
+                            </span>
+                        </div>
+                        <div class="col-10">
+                            <div class="form-floating">
+                                <textarea class="form-control is-invalid" id="floatingTextarea2"
+                                    style="height: 200px; max-height: 400px;" required placeholder=""></textarea>
+                                <label for="floatingTextarea2">Text:</label>
+                                <div class="invalid-feedback">
+                                    Error!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 mt-2">
+                            <span>Tags</span>
+                        </div>
+                        <div class="col-10">
+                            <div class="form-floating">
+                                <textarea class="form-control is-invalid" id="floatingTextarea2"
+                                    style="height: 50px; max-height: 100px;" required placeholder=""></textarea>
+                                <label for="floatingTextarea2">Tags:</label>
+                                <div class="invalid-feedback">
+                                    Error!
+                                </div>
+                            </div>
+                            <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">ASK!</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="col-3">
                 <section class="mb-3">
