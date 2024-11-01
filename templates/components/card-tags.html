@@ -1,5 +1,5 @@
 {% for tag in question.tags %}
-<span class="d-inline-flex flex-row gap-2">
+    <span class="d-inline-flex flex-row gap-2">
     <a href="{% url 'tag' given_tag=tag %}" class="card-link m-0">{{ tag }}</a>
-</span>
+    </span>
 {% endfor %}

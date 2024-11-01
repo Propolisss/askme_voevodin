@@ -1,29 +1,29 @@
 {% extends 'layouts/base.html' %}
 
 {% block main-title %}
-Settings:
+    Settings:
 {% endblock %}
 
 {% block subtitle %}
-<span class="fs-2">Dr. Pepper</span>
+    <span class="fs-2">Dr. Pepper</span>
 {% endblock %}
 
 {% block content %}
-<form class="d-flex flex-column gap-4">
-    {% include 'inputs/login.html' %}
-    {% include 'inputs/email.html' %}
-    {% include 'inputs/nickname.html' %}
-    <div class="row">
-        <div class="col-2 mt-2">
-            <span>Upload avatar</span>
-        </div>
-        <div class="col-10">
-            <img src="../static/img/200img.png" alt="avatar" class="img-fluid" style="max-height: 200px;">
-            <div class="mt-3">
-                <input class="form-control" type="file" id="formFile" required>
+    <form class="d-flex flex-column gap-4">
+        {% include 'inputs/login.html' %}
+        {% include 'inputs/email.html' %}
+        {% include 'inputs/nickname.html' %}
+        <div class="row">
+            <div class="col-2 mt-2">
+                <span>Upload avatar</span>
             </div>
-            <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Save</button>
+            <div class="col-10">
+                <img src="../static/img/200img.png" alt="avatar" class="img-fluid" style="max-height: 200px;">
+                <div class="mt-3">
+                    <input class="form-control" type="file" id="formFile" required>
+                </div>
+                <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Save</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
 {% endblock %}

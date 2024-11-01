@@ -2,21 +2,21 @@
 {% load static %}
 
 {% block main-title %}
-New Questions
+    New Questions
 {% endblock %}
 
 {% block subtitle %}
-<a href="{% url 'hot' %}">Hot Questions</a>
+    <a href="{% url 'hot' %}">Hot Questions</a>
 {% endblock %}
 
 {% block content %}
 
-{% for question in questions %}
+    {% for question in questions %}
 
-{% include 'components/question-item.html' %}
+        {% include 'components/question-item.html' %}
 
-{% endfor %}
+    {% endfor %}
 
-{% include 'components/pagination.html' %}
+    {% include 'components/pagination.html' %}
 
 {% endblock %}

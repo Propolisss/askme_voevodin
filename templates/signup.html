@@ -1,24 +1,24 @@
 {% extends 'layouts/base.html' %}
 
 {% block main-title %}
-Registration
+    Registration
 {% endblock %}
 
 {% block content %}
-<form class="d-flex flex-column gap-4">
-    {% include 'inputs/login.html' %} 
-    {% include 'inputs/email.html' %} 
-    {% include 'inputs/nickname.html' %} 
-    {% include 'inputs/password.html' %} 
-    {% include 'inputs/repeat-password.html' %} 
-    <div class="row">
-        <div class="col-2 mt-2">
-            <span>Upload avatar</span>
+    <form class="d-flex flex-column gap-4">
+        {% include 'inputs/login.html' %}
+        {% include 'inputs/email.html' %}
+        {% include 'inputs/nickname.html' %}
+        {% include 'inputs/password.html' %}
+        {% include 'inputs/repeat-password.html' %}
+        <div class="row">
+            <div class="col-2 mt-2">
+                <span>Upload avatar</span>
+            </div>
+            <div class="col-10">
+                <input class="form-control" type="file" id="formFile" required>
+                <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Register!</button>
+            </div>
         </div>
-        <div class="col-10">
-            <input class="form-control" type="file" id="formFile" required>
-            <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Register!</button>
-        </div>
-    </div>
-</form>
+    </form>
 {% endblock %}

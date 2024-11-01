@@ -29,19 +29,21 @@ ANSWERS = [
     } for _ in range(15)
 ]
 
+
 def paginate(objects_list, request, per_page=10):
     page_num = request.GET.get('page', 1)
     paginator = Paginator(objects_list, per_page)
     try:
         page = paginator.page(page_num)
-    except PageNotAnInteger: 
+    except PageNotAnInteger:
         page = paginator.page(1)
     except EmptyPage:
         if int(page_num) > paginator.num_pages:
             page = paginator.page(paginator.num_pages)
         elif int(page_num) < 1:
             page = paginator.page(1)
-    return page 
+    return page
+
 
 def index(request):
     page = paginate(QUESTIONS, request, per_page=5)
@@ -49,6 +51,7 @@ def index(request):
         'questions': page.object_list,
         'page_obj': page
     })
+
 
 def hot(request):
     hot_questions = copy.deepcopy(QUESTIONS)
@@ -59,6 +62,7 @@ def hot(request):
         'page_obj': page
     })
 
+
 def question(request, question_id):
     page = paginate(ANSWERS, request, per_page=5)
     question_item = BIG_QUESTIONS[question_id]
@@ -68,6 +72,7 @@ def question(request, question_id):
         'page_obj': page
     })
 
+
 def tag(request, given_tag):
     page = paginate(QUESTIONS, request, per_page=5)
     return render(request, 'tag.html', {
@@ -76,14 +81,18 @@ def tag(request, given_tag):
         'tag': given_tag
     })
 
+
 def ask(request):
     return render(request, 'ask.html')
+
 
 def settings(request):
     return render(request, 'settings.html')
 
+
 def login(request):
     return render(request, 'login.html')
+
 
 def signup(request):
     return render(request, 'signup.html')

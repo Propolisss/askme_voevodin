@@ -1,20 +1,20 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-{% include 'components/big-question-item.html' %}
+    {% include 'components/big-question-item.html' %}
 
-{% for answer in answers %}
-{% include 'components/answer-item.html' %}
-{% endfor %}
+    {% for answer in answers %}
+        {% include 'components/answer-item.html' %}
+    {% endfor %}
 
-{% include 'components/pagination.html' %}
+    {% include 'components/pagination.html' %}
 
-<form>
-    <div class="form-floating mb-3">
-        <textarea class="form-control" id="floatingTextarea2" style="height: 100px" placeholder=""></textarea>
-        <label for="floatingtextarea2">Enter your answer here...</label>
-    </div>
-    <button class="btn btn-primary rounded-0" type="submit">Answer</button>
-</form>
+    <form>
+        <div class="form-floating mb-3">
+            <textarea class="form-control" id="floatingTextarea2" style="height: 100px" placeholder=""></textarea>
+            <label for="floatingtextarea2">Enter your answer here...</label>
+        </div>
+        <button class="btn btn-primary rounded-0" type="submit">Answer</button>
+    </form>
 
 {% endblock %}
