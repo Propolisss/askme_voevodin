@@ -45,7 +45,7 @@ def hot(request):
 
 def question(request, question_id):
     try:
-        page = paginate(Question.objects.get(id=question_id).answers.all(), request, per_page=5)
+        page = paginate(Question.objects.get(id=question_id).answers.sort_answers().all(), request, per_page=5)
         return render(request, 'question.html', {
             'question': Question.objects.get(id=question_id),
             'answers': page.object_list,

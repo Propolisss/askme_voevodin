@@ -2,6 +2,7 @@ import time
 import random
 from itertools import product
 
+from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
@@ -24,7 +25,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ratio = options.get('ratio', 1)
         fake = Faker()
-        image_path = BASE_DIR / 'static/img/200img.png'
+        image_path = BASE_DIR / 'static/img'
         total_time = 0
 
         self.stdout.write(self.style.WARNING(f'Started filling db...'))
@@ -67,53 +68,34 @@ class Command(BaseCommand):
     def create_users(self, fake, ratio, image_path):
         self.stdout.write(self.style.WARNING(f'Creating users...'))
 
-        users = []
-        profiles = []
-        usernames = set()
-
-        for _ in range(ratio):
-            username = fake.user_name()
-            email = fake.email()
-            password = fake.password()
-
-            while username in usernames:
-                username = fake.user_name()
-
-            usernames.add(username)
-
-            user = User(username=username, email=email)
-            user.set_password(password)
-            users.append(user)
-
-            profiles.append(Profile(user=user))
+        users = [
+            User(username=fake.unique.user_name(), email=fake.email(),
+                 password=make_password(fake.password()))
+            for _ in range(ratio)
+        ]
+        profiles = [
+            Profile(user=user) for user in users
+        ]
 
         User.objects.bulk_create(users)
         Profile.objects.bulk_create(profiles)
 
         for profile in profiles:
-            with open(image_path, 'rb') as f:
-                profile.avatar.save('200img.jpg', File(f), save=True)
+            with open(image_path / f'img_{random.randint(0, 19)}.png', 'rb') as f:
+                profile.avatar.save(f'{profile.user.username}_avatar.png', File(f), save=True)
 
         self.stdout.write(self.style.SUCCESS(f'Users have been created successfully!'))
 
     def create_tags(self, fake, ratio):
         self.stdout.write(self.style.WARNING(f'Creating tags...'))
 
-        tags = []
-        unique_tags = set()
-
-        for _ in range(ratio):
-            tag = fake.word()
-
-            while tag in unique_tags:
-                tag = fake.word()
-            tags.append(Tag(name=tag))
-            unique_tags.add(tag)
+        tags = [
+            Tag(name=fake.unique.word())
+            for _ in range(ratio)
+        ]
 
         Tag.objects.bulk_create(tags)
         self.stdout.write(self.style.SUCCESS(f'Tags have been created successfully!'))
-
-        return Tag.objects.all()
 
     def create_questions(self, fake, ratio):
         self.stdout.write(self.style.WARNING(f'Creating questions...'))
@@ -226,7 +208,7 @@ class Command(BaseCommand):
         answer_pairs = answer_pairs[:ratio * 200]
 
         answer_likes = [
-            AnswerLike(profile_id=profile_id, answer_id=answer_id, is_liked=custom_boolean(0.2))
+            AnswerLike(profile_id=profile_id, answer_id=answer_id, is_liked=custom_boolean(random.random()))
             for profile_id, answer_id in answer_pairs
         ]
 
@@ -235,7 +217,7 @@ class Command(BaseCommand):
         question_pairs = question_pairs[:ratio * 200]
 
         question_likes = [
-            QuestionLike(profile_id=profile_id, question_id=question_id, is_liked=custom_boolean(0.2))
+            QuestionLike(profile_id=profile_id, question_id=question_id, is_liked=custom_boolean(random.random()))
             for profile_id, question_id in question_pairs
         ]
 

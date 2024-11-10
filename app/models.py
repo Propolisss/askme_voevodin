@@ -10,12 +10,21 @@ from django.db.models import Q, Count, F
 class QuestionManager(models.Manager):
     def get_hot(self):
         return self.annotate(
-            rating=Count('likes', filter=Q(likes__is_liked=True)) -
-                   Count('likes', filter=Q(likes__is_liked=False))
-        ).order_by('-rating')
+            rating=Count('likes', filter=Q(likes__is_liked=True), distinct=True) -
+                   Count('likes', filter=Q(likes__is_liked=False), distinct=True),
+            answer_count=Count('answers', distinct=True)
+        ).order_by('-rating', '-answer_count')
 
     def get_new(self):
         return self.order_by('-created_at')
+
+
+class AnswerManager(models.Manager):
+    def sort_answers(self):
+        return self.annotate(
+            like_count=Count('likes', filter=Q(likes__is_liked=True)) -
+                       Count('likes', filter=Q(likes__is_liked=False))
+        ).order_by('-correct', '-like_count')
 
 
 class ProfileManager(models.Manager):
@@ -84,10 +93,7 @@ class Answer(models.Model):
     def __str__(self):
         return f"Answer to {self.question.title}"
 
-    def get_rating(self):
-        likes = self.likes.filter(is_liked=True).count()
-        dislikes = self.likes.filter(is_liked=False).count()
-        return likes - dislikes
+    objects = AnswerManager()
 
 
 class QuestionLike(models.Model):
