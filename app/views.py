@@ -23,13 +23,17 @@ def paginate(objects_list, request, per_page=10):
     return page
 
 
+TAGS = Tag.objects.get_top()
+MEMBERS = Profile.objects.get_top()
+
+
 def index(request):
     page = paginate(Question.objects.get_new(), request, per_page=5)
     return render(request, 'index.html', {
         'questions': page.object_list,
         'page_obj': page,
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
 
 
@@ -38,8 +42,8 @@ def hot(request):
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page,
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
 
 
@@ -50,8 +54,8 @@ def question(request, question_id):
             'question': Question.objects.get(id=question_id),
             'answers': page.object_list,
             'page_obj': page,
-            'tags': Tag.objects.get_top(),
-            'members': Profile.objects.get_top()
+            'tags': TAGS,
+            'members': MEMBERS
         })
     except Question.DoesNotExist:
         return render(request, 'error.html', {
@@ -68,8 +72,8 @@ def tag(request, given_tag):
             'questions': page.object_list,
             'page_obj': page,
             'tag': given_tag,
-            'tags': Tag.objects.get_top(),
-            'members': Profile.objects.get_top()
+            'tags': TAGS,
+            'members': MEMBERS
         })
     except Tag.DoesNotExist:
         return render(request, 'error.html', {
@@ -81,27 +85,27 @@ def tag(request, given_tag):
 
 def ask(request):
     return render(request, 'ask.html', {
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
 
 
 def settings(request):
     return render(request, 'settings.html', {
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
 
 
 def login(request):
     return render(request, 'login.html', {
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
 
 
 def signup(request):
     return render(request, 'signup.html', {
-        'tags': Tag.objects.get_top(),
-        'members': Profile.objects.get_top()
+        'tags': TAGS,
+        'members': MEMBERS
     })
