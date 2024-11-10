@@ -20,3 +20,15 @@
     {% include 'components/pagination.html' %}
 
 {% endblock %}
+
+{% block tags %}
+    {% for tag in tags %}
+        {% include 'components/tag.html' %}
+    {% endfor %}
+{% endblock %}
+
+{% block best_members %}
+    {% for member in members %}
+        {% include 'components/member.html' %}
+    {% endfor %}
+{% endblock %}

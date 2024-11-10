@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block avatar %}
-    {{ MEDIA_URL }}{{ question.profile.avatar }}
+    {{ MEDIA_URL }}{{ answer.profile.avatar }}
 {% endblock %}
 
 {% block item %}
-    {{ question.get_rating }}
+    {{ answer.get_rating }}
 {% endblock %}

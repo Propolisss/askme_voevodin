@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+
+{% block wrapper %}
+    <div class="d-flex flex-column align-items-center justify-content-center h-100">
+        <h1>{{ error_code }}</h1>
+        <h2>{{ error_description }}</h2>
+        <p>
+            {{ error_message }}
+        </p>
+    </div>
+{% endblock %}

@@ -1,7 +1,7 @@
 <h5 class="card-title">
     <a href="{% url 'question' question_id=question.id %}">{{ question.title }}</a>
 </h5>
-<p class="card-text">{{ question.content }}</p>
-<a href="{% url 'question' question_id=question.id %}" class="card-link">answer (3)</a>
+<p class="card-text">{{ question.text }}</p>
+<a href="{% url 'question' question_id=question.id %}" class="card-link">answers ({{ question.answers.count }})</a>
 <span class="me-1 ms-3">Tags:</span>
 {% include 'components/card-tags.html' %}

@@ -1,5 +1,11 @@
 {% extends 'components/question-item.html' %}
 
+{% block card-info %}
+    <div class="col-1 d-flex justify-content-between flex-column pt-2 pb-2 gap-2">
+        {% include 'components/answer-card-info.html' %}
+    </div>
+{% endblock %}
+
 {% block card-body %}
     <div class="col-11 d-flex flex-column card-body justify-content-between pb-2">
         {% include 'components/answer-card-body.html' %}

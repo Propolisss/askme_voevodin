@@ -25,7 +25,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <form class="d-flex" role="search">
+            <form action="{% url 'ask' %}" class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success rounded-0" type="submit">ASK!</button>
             </form>
@@ -52,45 +52,37 @@
 
 
 <main class="container-fluid mt-3 w-100 pe-4 ps-4">
-    <div class="d-flex gap-3 align-items-center justify-content-start">
-        <span class="fs-1">{% block main-title %}{% endblock %}</span>
-        {% block subtitle %}{% endblock %}
-    </div>
-    <div class="row">
-        <div class="col-9 d-flex flex-column gap-4">
-            {% block content %}
-            {% endblock %}
+    {% block wrapper %}
+        <div class="d-flex gap-3 align-items-center justify-content-start">
+            <span class="fs-1">{% block main-title %}{% endblock %}</span>
+            {% block subtitle %}{% endblock %}
         </div>
-        <div class="col-3">
-            <section class="mb-3">
-                <h2>Popular tags</h2>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="#"><span class="badge text-bg-primary p-2">perl</span></a>
-                    <a href="#"><span class="badge text-bg-secondary p-2">python</span></a>
-                    <a href="#"><span class="badge text-bg-success p-2">TechoPark</span></a>
-                    <a href="#"><span class="badge text-bg-danger p-2">MySQL</span></a>
-                    <a href="#"><span class="badge text-bg-warning p-2">django</span></a>
-                    <a href="#"><span class="badge text-bg-info p-2">Mail.Ru</span></a>
-                    <a href="#"><span class="badge text-bg-light p-2">Voloshin</span></a>
-                    <a href="#"><span class="badge text-bg-dark p-2">Firefox</span></a>
-                </div>
-            </section>
-            <section>
-                <h2>Best members</h2>
-                <div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><a href="#">Mr. Freeman</a></li>
-                        <li class="list-group-item"><a href="#">Dr. House</a></li>
-                        <li class="list-group-item"><a href="#">Bender</a></li>
-                        <li class="list-group-item"><a href="#">Queen Victoria</a></li>
-                        <li class="list-group-item"><a href="#">V. Pupkin</a></li>
-                    </ul>
-                </div>
-            </section>
+        <div class="row">
+            <div class="col-9 d-flex flex-column gap-4">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div class="col-3">
+                <section class="mb-3">
+                    <h2>Popular tags</h2>
+                    <div class="d-flex gap-3 flex-wrap">
+                        {% block tags %}
+                        {% endblock %}
+                    </div>
+                </section>
+                <section>
+                    <h2>Best members</h2>
+                    <div>
+                        <ul class="list-group list-group-flush">
+                            {% block best_members %}
+                            {% endblock %}
+                        </ul>
+                    </div>
+                </section>
+            </div>
         </div>
-    </div>
+    {% endblock %}
 </main>
-
 <footer class="text-center">
     <p>&copy; 2024 Propolisss WEB-13</p>
 </footer>
