@@ -25,6 +25,7 @@ def paginate(objects_list, request, per_page=10):
 
 TAGS = Tag.objects.get_top()
 MEMBERS = Profile.objects.get_top()
+HOT = list(Question.objects.get_hot())
 
 
 def index(request):
@@ -38,7 +39,7 @@ def index(request):
 
 
 def hot(request):
-    page = paginate(Question.objects.get_hot(), request, per_page=5)
+    page = paginate(HOT, request, per_page=5)
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page,
@@ -49,7 +50,7 @@ def hot(request):
 
 def question(request, question_id):
     try:
-        page = paginate(Question.objects.get(id=question_id).answers.sort_answers().all(), request, per_page=5)
+        page = paginate(Question.objects.get(id=question_id).answers.sort_answers(), request, per_page=5)
         return render(request, 'question.html', {
             'question': Question.objects.get(id=question_id),
             'answers': page.object_list,

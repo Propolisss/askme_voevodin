@@ -68,19 +68,19 @@ class Command(BaseCommand):
     def create_users(self, fake, ratio, image_path):
         self.stdout.write(self.style.WARNING(f'Creating users...'))
 
-        users = [
-            User(username=fake.unique.user_name(), email=fake.email(),
-                 password=make_password(fake.password()))
-            for _ in range(ratio)
-        ]
-        profiles = [
-            Profile(user=user) for user in users
-        ]
+        # users = [
+        #     User(username=fake.unique.user_name(), email=fake.email(),
+        #          password=make_password(fake.password()))
+        #     for _ in range(ratio)
+        # ]
+        # profiles = [
+        #     Profile(user=user) for user in users
+        # ]
+        #
+        # User.objects.bulk_create(users)
+        # Profile.objects.bulk_create(profiles)
 
-        User.objects.bulk_create(users)
-        Profile.objects.bulk_create(profiles)
-
-        for profile in profiles:
+        for profile in Profile.objects.all():
             with open(image_path / f'img_{random.randint(0, 19)}.png', 'rb') as f:
                 profile.avatar.save(f'{profile.user.username}_avatar.png', File(f), save=True)
 
@@ -89,12 +89,15 @@ class Command(BaseCommand):
     def create_tags(self, fake, ratio):
         self.stdout.write(self.style.WARNING(f'Creating tags...'))
 
-        tags = [
-            Tag(name=fake.unique.word())
-            for _ in range(ratio)
-        ]
+        base_tags = [fake.unique.word() for _ in range(int(ratio ** 0.5) + 1)]
+        tag_pairs = [f"{tag1}_{tag2}" for tag1, tag2 in list(product(base_tags, repeat=2))]
+        tags = base_tags + tag_pairs
+        random.shuffle(tags)
+        tags = tags[:ratio]
 
+        tags = [Tag(name=tag) for tag in tags]
         Tag.objects.bulk_create(tags)
+
         self.stdout.write(self.style.SUCCESS(f'Tags have been created successfully!'))
 
     def create_questions(self, fake, ratio):
@@ -103,22 +106,23 @@ class Command(BaseCommand):
         profiles = list(Profile.objects.all().values_list('id', flat=True))
         tags = list(Tag.objects.all().values_list('id', flat=True))
 
-        questions = [
-            Question(profile_id=fake.random_element(elements=profiles),
-                     title=fake.sentence(nb_words=10),
-                     text=fake.text(max_nb_chars=500)) for _ in range(ratio * 10)
-        ]
+        for i in range(10):
+            questions = [
+                Question(profile_id=fake.random_element(elements=profiles),
+                         title=fake.sentence(nb_words=10),
+                         text=fake.text(max_nb_chars=500)) for _ in range(ratio)
+            ]
 
-        Question.objects.bulk_create(questions)
+            Question.objects.bulk_create(questions)
 
-        question_tag_links = [
-            Question.tags.through(question_id=question.id, tag_id=tag_id)
-            for question in questions for tag_id in
-            fake.random_elements(elements=tags, unique=True,
-                                 length=fake.random_int(min=1, max=min(5, len(tags))))
-        ]
+            question_tag_links = [
+                Question.tags.through(question_id=question.id, tag_id=tag_id)
+                for question in questions for tag_id in
+                fake.random_elements(elements=tags, unique=True,
+                                     length=fake.random_int(min=1, max=min(5, len(tags))))
+            ]
 
-        Question.tags.through.objects.bulk_create(question_tag_links)
+            Question.tags.through.objects.bulk_create(question_tag_links)
 
         self.stdout.write(self.style.SUCCESS(f'Questions have been created successfully!'))
 
@@ -128,12 +132,13 @@ class Command(BaseCommand):
         questions = list(Question.objects.all().values_list('id', flat=True))
         profiles = list(Profile.objects.all().values_list('id', flat=True))
 
-        answers = [Answer(question_id=fake.random_element(elements=questions),
-                          profile_id=fake.random_element(elements=profiles),
-                          text=fake.text(max_nb_chars=500),
-                          correct=fake.boolean()) for _ in range(ratio * 100)]
+        for i in range(100):
+            answers = [Answer(question_id=fake.random_element(elements=questions),
+                              profile_id=fake.random_element(elements=profiles),
+                              text=fake.text(max_nb_chars=500),
+                              correct=fake.boolean()) for _ in range(ratio)]
 
-        Answer.objects.bulk_create(answers)
+            Answer.objects.bulk_create(answers)
 
         self.stdout.write(self.style.SUCCESS(f'Answers have been created successfully!'))
 
@@ -203,25 +208,47 @@ class Command(BaseCommand):
         #         break
         # QuestionLike.objects.bulk_create(question_likes)
 
-        answer_pairs = list(product(profiles, answers))
-        random.shuffle(answer_pairs)
-        answer_pairs = answer_pairs[:ratio * 200]
+        # answer_pairs = list(product(profiles, answers))
+        # random.shuffle(answer_pairs)
+        # answer_pairs = answer_pairs[:ratio * 200]
+        #
+        # answer_likes = [
+        #     AnswerLike(profile_id=profile_id, answer_id=answer_id, is_liked=custom_boolean(random.random()))
+        #     for profile_id, answer_id in answer_pairs
+        # ]
+        # answer_likes.clear()
+        #
+        # question_pairs = list(product(profiles, questions))
+        # random.shuffle(question_pairs)
+        # question_pairs = question_pairs[:ratio * 200]
+        #
+        # question_likes = [
+        #     QuestionLike(profile_id=profile_id, question_id=question_id, is_liked=custom_boolean(random.random()))
+        #     for profile_id, question_id in question_pairs
+        # ]
+        answer_likes = []
+        question_likes = []
 
-        answer_likes = [
-            AnswerLike(profile_id=profile_id, answer_id=answer_id, is_liked=custom_boolean(random.random()))
-            for profile_id, answer_id in answer_pairs
-        ]
+        for profile in profiles:
+            answer_likes += [
+                AnswerLike(answer_id=answer, profile_id=profile, is_liked=custom_boolean(random.random()))
+                for answer in fake.random_elements(elements=answers, length=200, unique=True)
+            ]
+            if len(answer_likes) >= ratio:
+                AnswerLike.objects.bulk_create(answer_likes)
+                answer_likes.clear()
+        if len(answer_likes):
+            AnswerLike.objects.bulk_create(answer_likes)
 
-        question_pairs = list(product(profiles, questions))
-        random.shuffle(question_pairs)
-        question_pairs = question_pairs[:ratio * 200]
-
-        question_likes = [
-            QuestionLike(profile_id=profile_id, question_id=question_id, is_liked=custom_boolean(random.random()))
-            for profile_id, question_id in question_pairs
-        ]
-
-        AnswerLike.objects.bulk_create(answer_likes)
-        QuestionLike.objects.bulk_create(question_likes)
+        for profile in profiles:
+            question_likes += [
+                QuestionLike(question_id=question, profile_id=profile, is_liked=custom_boolean(random.random()))
+                for question in fake.random_elements(elements=questions, length=200, unique=True)
+            ]
+            if len(question_likes) >= ratio:
+                QuestionLike.objects.bulk_create(question_likes)
+                question_likes.clear()
+        if len(question_likes):
+            QuestionLike.objects.bulk_create(question_likes)
 
         self.stdout.write(self.style.SUCCESS(f'Likes have been created successfully!'))
