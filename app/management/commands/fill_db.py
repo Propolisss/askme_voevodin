@@ -68,17 +68,17 @@ class Command(BaseCommand):
     def create_users(self, fake, ratio, image_path):
         self.stdout.write(self.style.WARNING(f'Creating users...'))
 
-        # users = [
-        #     User(username=fake.unique.user_name(), email=fake.email(),
-        #          password=make_password(fake.password()))
-        #     for _ in range(ratio)
-        # ]
-        # profiles = [
-        #     Profile(user=user) for user in users
-        # ]
-        #
-        # User.objects.bulk_create(users)
-        # Profile.objects.bulk_create(profiles)
+        users = [
+            User(username=fake.unique.user_name(), email=fake.email(),
+                 password=make_password(fake.password()))
+            for _ in range(ratio)
+        ]
+        profiles = [
+            Profile(user=user) for user in users
+        ]
+
+        User.objects.bulk_create(users)
+        Profile.objects.bulk_create(profiles)
 
         for profile in Profile.objects.all():
             with open(image_path / f'img_{random.randint(0, 19)}.png', 'rb') as f:

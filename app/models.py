@@ -30,7 +30,7 @@ class AnswerManager(models.Manager):
 class ProfileManager(models.Manager):
     def get_top(self):
         return self.annotate(
-            rating=Count('question_likes', filter=Q(question_likes__is_liked=True)) -
+            rating=Count('question_likes', filter=Q(question_likes__is_liked=True)) +
                    Count('answer_likes', filter=Q(answer_likes__is_liked=True))
         ).order_by('-rating')[:10]
 

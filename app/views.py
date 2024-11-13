@@ -25,7 +25,7 @@ def paginate(objects_list, request, per_page=10):
 
 TAGS = Tag.objects.get_top()
 MEMBERS = Profile.objects.get_top()
-HOT = list(Question.objects.get_hot())
+HOT = Question.objects.get_hot()
 
 
 def index(request):
