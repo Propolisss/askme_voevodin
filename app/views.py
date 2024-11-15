@@ -50,7 +50,7 @@ def hot(request):
 
 def question(request, question_id):
     try:
-        page = paginate(Question.objects.get(id=question_id).answers.sort_answers(), request, per_page=5)
+        page = paginate(Question.objects.get_answers_by_id(question_id), request, per_page=5)
         return render(request, 'question.html', {
             'question': Question.objects.get(id=question_id),
             'answers': page.object_list,
@@ -68,7 +68,7 @@ def question(request, question_id):
 
 def tag(request, given_tag):
     try:
-        page = paginate(Tag.objects.get(name=given_tag).questions.all(), request, per_page=5)
+        page = paginate(Tag.objects.get_questions_by_tag(given_tag), request, per_page=5)
         return render(request, 'tag.html', {
             'questions': page.object_list,
             'page_obj': page,

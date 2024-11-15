@@ -18,6 +18,9 @@ class QuestionManager(models.Manager):
     def get_new(self):
         return self.order_by('-created_at')
 
+    def get_answers_by_id(self, id):
+        return self.get(id=id).answers.sort_answers()
+
 
 class AnswerManager(models.Manager):
     def sort_answers(self):
@@ -40,6 +43,9 @@ class TagManager(models.Manager):
         return self.annotate(
             rating=Count('questions')
         ).order_by('-rating')[:10]
+
+    def get_questions_by_tag(self, name):
+        return self.get(name=name).questions.all()
 
 
 class Profile(models.Model):
