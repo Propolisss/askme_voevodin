@@ -23,9 +23,17 @@ def paginate(objects_list, request, per_page=10):
     return page
 
 
+def common_context(request):
+    tags = Tag.objects.get_top()
+    members = Profile.objects.get_top()
+    return {
+        'tags': tags,
+        'members': members
+    }
+
+
 TAGS = Tag.objects.get_top()
 MEMBERS = Profile.objects.get_top()
-HOT = Question.objects.get_hot()
 
 
 def index(request):
@@ -39,7 +47,7 @@ def index(request):
 
 
 def hot(request):
-    page = paginate(HOT, request, per_page=5)
+    page = paginate(Question.objects.get_hot(), request, per_page=5)
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page,
