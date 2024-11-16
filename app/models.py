@@ -45,7 +45,7 @@ class TagManager(models.Manager):
         ).order_by('-rating')[:10]
 
     def get_questions_by_tag(self, name):
-        return self.get(name=name).questions
+        return self.get(name=name).questions.all()
 
 
 class Profile(models.Model):
