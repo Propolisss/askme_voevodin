@@ -1,4 +1,5 @@
 {% extends 'index.html' %}
+{% load bootstrap5 %}
 
 {% block main-title %}
     Log in
@@ -8,26 +9,13 @@
 {% endblock %}
 
 {% block content %}
-    <form class="d-flex flex-column gap-4">
-        {% include 'inputs/login.html' %}
-        <div class="row">
-            <div class="col-2 mt-2">
-            <span>
-                Password
-            </span>
-            </div>
-            <div class="col-10">
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control is-invalid" id="inputPassword" required placeholder="">
-                    <label for="inputPassword">Password:</label>
-                    <div class="invalid-feedback">
-                        Error!
-                    </div>
-                </div>
-                <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Log in!</button>
-                <br>
-                <a href="{% url 'signup' %}">create new account</a>
-            </div>
-        </div>
+    <form class="d-flex flex-column gap-4" method="POST" action="{% url 'login' %}?continue={{ request.GET.continue }}">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button class="btn btn-primary rounded-0 mt-3 mb-3" type="submit">Log in!</button>
+            <br>
+            <a href="{% url 'signup' %}">create new account</a>
+        {% endbuttons %}
     </form>
 {% endblock %}

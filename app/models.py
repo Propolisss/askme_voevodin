@@ -9,6 +9,7 @@ from django.db.models import Q, Count, F
 
 class QuestionManager(models.Manager):
     def get_hot(self):
+        self.prefetch_related('answers', 'likes')
         return self.annotate(
             rating=Count('likes', filter=Q(likes__is_liked=True), distinct=True) -
                    Count('likes', filter=Q(likes__is_liked=False), distinct=True),
@@ -32,10 +33,11 @@ class AnswerManager(models.Manager):
 
 class ProfileManager(models.Manager):
     def get_top(self):
-        return self.annotate(
-            rating=Count('questions__likes', filter=Q(questions__likes__is_liked=True)) +
-                   Count('answers__likes', filter=Q(answers__likes__is_liked=True))
-        ).order_by('-rating')[:10]
+        # return self.annotate(
+        #     rating=Count('questions__likes', filter=Q(questions__likes__is_liked=True)) +
+        #            Count('answers__likes', filter=Q(answers__likes__is_liked=True))
+        # ).order_by('-rating')[:10]
+        return self.all()[:10]
 
 
 class TagManager(models.Manager):

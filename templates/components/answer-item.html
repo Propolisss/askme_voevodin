@@ -1,5 +1,7 @@
 {% extends 'components/question-item.html' %}
 
+{% block id %}{{ answer.id }}{% endblock %}
+
 {% block card-info %}
     <div class="col-1 d-flex justify-content-between flex-column pt-2 pb-2 gap-2">
         {% include 'components/answer-card-info.html' %}

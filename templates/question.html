@@ -1,4 +1,6 @@
 {% extends 'index.html' %}
+{% load bootstrap5 %}
+
 
 {% block main-title %}{% endblock %}
 {% block subtitle %}{% endblock %}
@@ -12,12 +14,14 @@
 
     {% include 'components/pagination.html' %}
 
-    <form>
-        <div class="form-floating mb-3">
-            <textarea class="form-control" id="floatingTextarea2" style="height: 100px" placeholder=""></textarea>
-            <label for="floatingtextarea2">Enter your answer here...</label>
-        </div>
-        <button class="btn btn-primary rounded-0" type="submit">Answer</button>
+    <form action='{% url 'question' question.id %}' method="POST">
+        {% csrf_token %}
+        {% if request.user.is_authenticated %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button class="btn btn-primary rounded-0" type="submit">Answer</button>
+            {% endbuttons %}
+        {% endif %}
     </form>
 
 {% endblock %}

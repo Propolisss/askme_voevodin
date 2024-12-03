@@ -67,7 +67,6 @@ class Command(BaseCommand):
 
     def create_users(self, fake, ratio, image_path):
         self.stdout.write(self.style.WARNING(f'Creating users...'))
-
         users = [
             User(username=fake.unique.user_name(), email=fake.email(),
                  password=make_password(fake.password()))

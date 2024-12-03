@@ -2,7 +2,11 @@
 {% load static %}
 
 {% block avatar %}
-    {{ MEDIA_URL }}{{ question.profile.avatar }}
+    {% if question.profile.avatar %}
+        {{ MEDIA_URL }}{{ question.profile.avatar }}
+    {% else %}
+        {% static 'img/200img.png' %}
+    {% endif %}
 {% endblock %}
 
 {% block item %}
