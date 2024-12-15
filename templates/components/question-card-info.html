@@ -1,9 +1,29 @@
 {% extends 'components/card-info.html' %}
 {% load static %}
 
+{% block like-type %}
+    question-like-button
+{% endblock %}
+
+{% block dislike-type %}
+    question-dislike-button
+{% endblock %}
+
+{% block like-disabled %}
+    {% if request.user.profile.id in question.liked_profiles %}
+        disabled
+    {% endif %}
+{% endblock %}
+
+{% block dislike-disabled %}
+    {% if request.user.profile.id in question.disliked_profiles %}
+        disabled
+    {% endif %}
+{% endblock %}
+
 {% block avatar %}
     {% if question.profile.avatar %}
-        {{ MEDIA_URL }}{{ question.profile.avatar }}
+        {{ question.profile.avatar.url }}
     {% else %}
         {% static 'img/200img.png' %}
     {% endif %}

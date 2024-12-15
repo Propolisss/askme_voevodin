@@ -89,6 +89,12 @@ class Question(models.Model):
         dislikes = self.likes.filter(is_liked=False).count()
         return likes - dislikes
 
+    def liked_profiles(self):
+        return self.likes.filter(is_liked=True).values_list('profile', flat=True)
+
+    def disliked_profiles(self):
+        return self.likes.filter(is_liked=False).values_list('profile', flat=True)
+
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
@@ -102,6 +108,12 @@ class Answer(models.Model):
         return f"Answer to {self.question.title}"
 
     objects = AnswerManager()
+
+    def liked_profiles(self):
+        return self.likes.filter(is_liked=True).values_list('profile', flat=True)
+
+    def disliked_profiles(self):
+        return self.likes.filter(is_liked=False).values_list('profile', flat=True)
 
 
 class QuestionLike(models.Model):

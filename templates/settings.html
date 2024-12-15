@@ -17,7 +17,7 @@
         {% bootstrap_form form %}
         <img src="
         {% if request.user.profile.avatar %}
-            {{ MEDIA_URL }}{{ request.user.profile.avatar }}
+            {{ request.user.profile.avatar.url }}
         {% else %}
             {% static 'img/200img.png' %}
         {% endif %}" alt="avatar" class="img-fluid"

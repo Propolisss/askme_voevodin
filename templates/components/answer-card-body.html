@@ -3,6 +3,9 @@
     <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
             {% if answer.correct %}
            checked
+            {% endif %}
+            {% if question.profile != request.user.profile %}
+           disabled
             {% endif %}>
     <label class="form-check-label" for="flexCheckDefault">
         Correct!

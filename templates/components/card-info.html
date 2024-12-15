@@ -1,11 +1,13 @@
 <img src="{% block avatar %}{% endblock %}" class="img-fluid" alt="avatar">
 <div class="d-flex align-items-center justify-content-center gap-1">
-    <span class="fs-5">{% block item %}{% endblock %}</span>
+    <span class="fs-5 like-count">{% block item %}{% endblock %}</span>
     <div class="d-flex flex-column gap-0">
-        <button type="button" class="btn btn-sm p-0 m-0">
+        <button type="button" class="btn btn-sm p-0 m-0 {% block like-type %}{% endblock %}"
+                {% block like-disabled %}{% endblock %}>
             <span class="fs-5" style="line-height: 0;">▲</span>
         </button>
-        <button type="button" class="btn btn-sm p-0 m-0">
+        <button type="button" class="btn btn-sm p-0 m-0 {% block dislike-type %}{% endblock %}"
+                {% block dislike-disabled %}{% endblock %}>
             <span class="fs-5" style="line-height: 0;">▼</span>
         </button>
     </div>

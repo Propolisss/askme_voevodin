@@ -1,9 +1,31 @@
 {% extends 'components/card-info.html' %}
 {% load static %}
 
+{% block like-type %}
+    answer-like-button
+{% endblock %}
+
+{% block dislike-type %}
+    answer-dislike-button
+{% endblock %}
+
+
+{% block like-disabled %}
+    {% if request.user.profile.id in answer.liked_profiles %}
+        disabled
+    {% endif %}
+{% endblock %}
+
+{% block dislike-disabled %}
+    {% if request.user.profile.id in answer.disliked_profiles %}
+        disabled
+    {% endif %}
+{% endblock %}
+
+
 {% block avatar %}
     {% if answer.profile.avatar %}
-        {{ MEDIA_URL }}{{ answer.profile.avatar }}
+        {{ answer.profile.avatar.url }}
     {% else %}
         {% static 'img/200img.png' %}
     {% endif %}

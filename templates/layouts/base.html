@@ -34,7 +34,7 @@
                 <div class="d-flex gap-2 align-items-center pe-3">
                     <img src="
                     {% if request.user.profile.avatar %}
-                        {{ MEDIA_URL }}{{ request.user.profile.avatar }}
+                        {{ request.user.profile.avatar.url }}
                     {% else %}
                         {% static 'img/200img.png' %}
                     {% endif %}" alt="avatar" height="50">
@@ -95,5 +95,6 @@
 </footer>
 
 <script src="{% static '/js/bootstrap.min.js' %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

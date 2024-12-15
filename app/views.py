@@ -1,14 +1,19 @@
 import copy
+import json
 from audioop import reverse
+from gc import get_objects
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.http.response import JsonResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse as reverse
+from django.views.decorators.http import require_POST
+
 from app.forms import LoginForm, UserForm, AnswerForm, SettingsForm, QuestionForm
-from app.models import Question, Tag, Answer, Profile
+from app.models import Question, Tag, Answer, Profile, QuestionLike, AnswerLike
 
 
 # Create your views here.
@@ -74,6 +79,7 @@ def redirect_to_answer(question_id, answer_id, answers):
     }) + f'?page={get_page_number(answers, answer_id)}' + f'#{answer_id}')
 
 
+# @login_required(redirect_field_name='continue')
 def question(request, question_id):
     try:
         answers = Question.objects.get_answers_by_id(question_id)
@@ -90,7 +96,8 @@ def question(request, question_id):
             'page_obj': page,
             'tags': TAGS,
             'members': MEMBERS,
-            'form': form
+            'form': form,
+            'has_liked': Question.objects.get(id=question_id).likes.filter(profile=request.user.profile).first(),
         })
     except Question.DoesNotExist:
         return render(request, 'error.html', {
@@ -124,7 +131,7 @@ def tag(request, given_tag):
         })
 
 
-@login_required
+@login_required(redirect_field_name='continue')
 def ask(request):
     form = QuestionForm(request.user, data=(request.POST or None))
     if request.method == 'POST':
@@ -138,7 +145,7 @@ def ask(request):
     })
 
 
-@login_required
+@login_required(redirect_field_name='continue')
 def settings(request):
     form = SettingsForm(request.user, data=(request.POST or None), files=(request.FILES or None),
                         instance=request.user)
@@ -160,7 +167,7 @@ def login(request):
             user = auth.authenticate(request, **form.cleaned_data)
             if user:
                 auth.login(request, user)
-                continue_page = request.GET.get('continue', None)
+                continue_page = request.POST.get('continue', None)
                 if continue_page:
                     return redirect(continue_page)
                 else:
@@ -196,3 +203,52 @@ def logout(request):
         return redirect(continue_page)
     else:
         return redirect(reverse('login'))
+
+
+@require_POST
+@login_required(redirect_field_name='continue')
+def answer_like(request, answer_id):
+    body = json.loads(request.body)
+    answer_like, _ = AnswerLike.objects.get_or_create(answer_id=answer_id, profile=request.user.profile)
+    answer_like.is_liked = body['is_liked']
+    answer_like.save()
+
+    answer_likes_count = AnswerLike.objects.filter(answer_id=answer_id,
+                                                   is_liked=True).count() - AnswerLike.objects.filter(
+        answer_id=answer_id, is_liked=False).count()
+    return JsonResponse({
+        'answer_likes_count': answer_likes_count,
+    })
+
+
+@require_POST
+@login_required(redirect_field_name='continue')
+def question_like(request, question_id):
+    body = json.loads(request.body)
+    question_like, _ = QuestionLike.objects.get_or_create(question_id=question_id, profile=request.user.profile)
+    question_like.is_liked = body['is_liked']
+    question_like.save()
+
+    question_likes_count = QuestionLike.objects.filter(question_id=question_id,
+                                                       is_liked=True).count() - QuestionLike.objects.filter(
+        question_id=question_id, is_liked=False).count()
+    return JsonResponse({
+        'question_likes_count': question_likes_count
+    })
+
+
+@require_POST
+@login_required(redirect_field_name='continue')
+def mark_answer(request, answer_id):
+    body = json.loads(request.body)
+    answer = get_object_or_404(Answer, id=answer_id)
+    if answer.question.profile != request.user.profile:
+        return JsonResponse({
+            'success': False,
+            'error': 'Вы не являетесь автором вопроса',
+        }, status=403)
+    answer.save()
+
+    return JsonResponse({
+        'success': True
+    })

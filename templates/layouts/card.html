@@ -1,4 +1,4 @@
-<div id="{% block id %}{{ question.id }}{% endblock %}" class="card">
+<div id="{% block id %}{{ question.id }}{% endblock %}" class="card {% block card-type %}{% endblock %}">
     <div class="row m-0">
         {% block card-info %}
         {% endblock %}

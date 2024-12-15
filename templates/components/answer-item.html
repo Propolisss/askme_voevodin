@@ -1,5 +1,9 @@
 {% extends 'components/question-item.html' %}
 
+{% block card-type %}
+    answer-card
+{% endblock %}
+
 {% block id %}{{ answer.id }}{% endblock %}
 
 {% block card-info %}
