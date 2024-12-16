@@ -144,6 +144,7 @@ class SettingsForm(forms.ModelForm):
         if 'email' in self.changed_data:
             self._user.email = self.cleaned_data['email']
 
+        print(f'before: {self._user.profile.avatar.url}')
         if 'avatar' in self.changed_data:
             old_avatar = self._user.profile.avatar
             if old_avatar:
@@ -156,9 +157,10 @@ class SettingsForm(forms.ModelForm):
                 ext = os.path.splitext(self._user.profile.avatar.path)[1]
                 self._user.profile.avatar.name = os.path.join(os.path.dirname(self.cleaned_data['avatar'].name),
                                                               f"{self._user.username}_avatar{ext}")
-
         self._user.save()
         self._user.profile.save()
+        print(f'after: {self._user.profile.avatar.url}')
+        print(f'{self._user.profile.avatar.path}')
 
         return self._user
 
