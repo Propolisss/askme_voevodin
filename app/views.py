@@ -247,6 +247,8 @@ def mark_answer(request, answer_id):
             'success': False,
             'error': 'Вы не являетесь автором вопроса',
         }, status=403)
+
+    answer.correct = body['correct']
     answer.save()
 
     return JsonResponse({
