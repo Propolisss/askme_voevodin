@@ -7,3 +7,62 @@ body {
 main {
     flex: 1;
 }
+
+.search-suggestions {
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+    padding: 10px;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.suggestion-item h3 {
+    margin: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion-item p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion-item.no-results {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 10px;
+}
+
+.suggestion-item.searching {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 10px;
+}

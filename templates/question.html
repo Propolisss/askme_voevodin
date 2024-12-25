@@ -25,3 +25,106 @@
     </form>
 
 {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        const answerTemplate = `
+<div id="" class="card answer-card">
+    <div class="row m-0">
+        <div class="col-1 d-flex justify-content-between flex-column pt-2 pb-2 gap-2">
+            <img src="" class="img-fluid answer-avatar" alt="avatar">
+            <div class="d-flex align-items-center justify-content-center gap-1">
+                <span class="fs-5 like-count">0</span>
+                <div class="d-flex flex-column gap-0">
+                    <button type="button" class="btn btn-sm p-0 m-0 answer-like-button">
+                        <span class="fs-5" style="line-height: 0;">▲</span>
+                    </button>
+                    <button type="button" class="btn btn-sm p-0 m-0 answer-dislike-button">
+                        <span class="fs-5" style="line-height: 0;">▼</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-11 d-flex flex-column card-body justify-content-between pb-2">
+            <p class="card-text"></p>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Correct!
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+        `;
+
+        const centrifuge = new Centrifuge("{{ centrifugo.url }}", {
+            token: "{{ centrifugo.token }}"
+        });
+
+        centrifuge.on('connecting', function (ctx) {
+            console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+        }).on('connected', function (ctx) {
+            console.log(`connected over ${ctx.transport}`);
+        }).on('disconnected', function (ctx) {
+            console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+        }).connect();
+
+        const sub = centrifuge.newSubscription("{{ question.id }}");
+
+        sub.on('publication', function (ctx) {
+            console.log(ctx.data);
+
+            const profile_id = {{ request.user.profile.id }};
+            console.log('profile_id: ', profile_id);
+
+            // если это отправитель, то не рисуем, так как во вьюхе редиректим сразу на вопрос
+            if (profile_id === ctx.profile) {
+                return;
+            }
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(answerTemplate, 'text/html');
+            const answerElement = doc.body.firstChild;
+
+            answerElement.querySelector('.answer-avatar').src = ctx.data.avatar;
+            answerElement.querySelector('.card-text').textContent = ctx.data.text;
+            answerElement.id = ctx.data.id;
+
+            var isAdded = false;
+            const answersContainer = document.querySelector('.content');
+
+            for (let i = 0; i < answersContainer.children.length; i++) {
+                const child = answersContainer.children[i];
+                // если это ответ
+                if (child.className.includes('answer-card')) {
+                    const likes = child.querySelector('.like-count').textContent;
+                    const correct = child.querySelector('.form-check-input').checked;
+                    // условие вставки перед ответом
+                    if (!correct && likes < 0) {
+                        answersContainer.insertBefore(answerElement, child);
+                        isAdded = true;
+                        break;
+                    }
+                }
+            }
+            // если ещё не добавили, значит добавляем в конец
+            if (!isAdded) {
+                answersContainer.insertBefore(answerElement,
+                    answersContainer.children[answersContainer.children.length - 2]);
+            }
+            // если стало больше, чем умещается на странице, то удаляем последний 
+            if (answersContainer.children.length === 6 + 3) {
+                answersContainer.removeChild(answersContainer.children[6]);
+            }
+            registerAnswer(answerElement);
+        }).on('subscribing', function (ctx) {
+            console.log(`subscribing: ${ctx.code}, ${ctx.reason}`);
+        }).on('subscribed', function (ctx) {
+            console.log('subscribed', ctx);
+        }).on('unsubscribed', function (ctx) {
+            console.log(`unsubscribed: ${ctx.code}, ${ctx.reason}`);
+        }).subscribe();
+    </script>
+{% endblock %}

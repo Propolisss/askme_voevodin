@@ -1,10 +1,18 @@
 import copy
 import json
 from audioop import reverse
+import time
 from gc import get_objects
+from itertools import chain
 
+import jwt
+from cent import Client
+from cent.dto import PublishRequest
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser
+from django.core import serializers
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.http.response import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,6 +20,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.urls import reverse as reverse
 from django.views.decorators.http import require_POST
 
+from askme_voevodin import settings as sett
 from app.forms import LoginForm, UserForm, AnswerForm, SettingsForm, QuestionForm
 from app.models import Question, Tag, Answer, Profile, QuestionLike, AnswerLike
 
@@ -33,17 +42,18 @@ def paginate(objects_list, request, per_page=10):
     return page
 
 
-def common_context(request):
-    tags = Tag.objects.get_top()
-    members = Profile.objects.get_top()
+def get_centrifugo_data(user_id):
+    ws_url = sett.CENTRIFUGO_WS_URL
+    secret = sett.CENTRIFUGO_SECRET
+    token = jwt.encode(
+        {"sub": str(user_id), "exp": int(time.time()) + 10 * 60}, secret, algorithm="HS256"
+    )
     return {
-        'tags': tags,
-        'members': members
+        "centrifugo": {
+            "token": token,
+            "url": ws_url,
+        }
     }
-
-
-TAGS = Tag.objects.get_top()
-MEMBERS = Profile.objects.get_top()
 
 
 def index(request):
@@ -51,8 +61,8 @@ def index(request):
     return render(request, 'index.html', {
         'questions': page.object_list,
         'page_obj': page,
-        'tags': TAGS,
-        'members': MEMBERS
+        # 'tags': TAGS,
+        # 'members': MEMBERS,
     })
 
 
@@ -61,8 +71,8 @@ def hot(request):
     return render(request, 'hot.html', {
         'questions': page.object_list,
         'page_obj': page,
-        'tags': TAGS,
-        'members': MEMBERS
+        # 'tags': TAGS,
+        # 'members': MEMBERS
     })
 
 
@@ -89,15 +99,34 @@ def question(request, question_id):
         if request.method == 'POST':
             if form.is_valid():
                 answer = form.save()
+
+                api_url = sett.CENTRIFUGO_API_URL
+                api_key = sett.CENTRIFUGO_API_KEY
+                client = Client(api_url, api_key)
+                request_message = PublishRequest(
+                    channel=f'{question_id}',
+                    data={
+                        **model_to_dict(answer),
+                        'avatar': request.user.profile.avatar.url
+                    }
+                )
+                client.publish(request_message)
+
                 return redirect_to_answer(question_id, answer.id, answers)
+        try:
+            has_liked = Question.objects.get(id=question_id).likes.filter(profile=request.user.profile).first()
+        except AttributeError:
+            # если пользователь не зарегестрирован
+            has_liked = None
         return render(request, 'question.html', {
             'question': Question.objects.get(id=question_id),
             'answers': page.object_list,
             'page_obj': page,
-            'tags': TAGS,
-            'members': MEMBERS,
+            # 'tags': TAGS,
+            # 'members': MEMBERS,
             'form': form,
-            'has_liked': Question.objects.get(id=question_id).likes.filter(profile=request.user.profile).first(),
+            'has_liked': has_liked,
+            **get_centrifugo_data(request.user.id),
         })
     except Question.DoesNotExist:
         return render(request, 'error.html', {
@@ -120,8 +149,8 @@ def tag(request, given_tag):
             'questions': page.object_list,
             'page_obj': page,
             'tag': given_tag,
-            'tags': TAGS,
-            'members': MEMBERS
+            # 'tags': TAGS,
+            # 'members': MEMBERS
         })
     except Tag.DoesNotExist:
         return render(request, 'error.html', {
@@ -139,8 +168,8 @@ def ask(request):
             question = form.save()
             return redirect('question', question_id=question.id)
     return render(request, 'ask.html', {
-        'tags': TAGS,
-        'members': MEMBERS,
+        # 'tags': TAGS,
+        # 'members': MEMBERS,
         'form': form
     })
 
@@ -154,8 +183,8 @@ def settings(request):
             form.save()
             form = SettingsForm(request.user, instance=request.user)
     return render(request, 'settings.html', {
-        'tags': TAGS,
-        'members': MEMBERS,
+        # 'tags': TAGS,
+        # 'members': MEMBERS,
         'form': form
     })
 
@@ -175,8 +204,8 @@ def login(request):
             form.add_error('password', 'Invalid username or password')
 
     return render(request, 'login.html', {
-        'tags': TAGS,
-        'members': MEMBERS,
+        # 'tags': TAGS,
+        # 'members': MEMBERS,
         'form': form
     })
 
@@ -189,8 +218,8 @@ def signup(request):
             auth.login(request, user)
             return redirect(reverse('index'))
     return render(request, 'signup.html', {
-        'tags': TAGS,
-        'members': MEMBERS,
+        # 'tags': TAGS,
+        # 'members': MEMBERS,
         'form': form
     })
 
@@ -232,6 +261,7 @@ def question_like(request, question_id):
     question_likes_count = QuestionLike.objects.filter(question_id=question_id,
                                                        is_liked=True).count() - QuestionLike.objects.filter(
         question_id=question_id, is_liked=False).count()
+
     return JsonResponse({
         'question_likes_count': question_likes_count
     })
@@ -253,4 +283,15 @@ def mark_answer(request, answer_id):
 
     return JsonResponse({
         'success': True
+    })
+
+
+def search(request, text):
+    print(f'text: {text}')
+    suggestions = Question.objects.search(text)
+
+    data = serializers.serialize('json', suggestions)
+
+    return JsonResponse({
+        'suggestions': data,
     })

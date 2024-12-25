@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap5'
+    'bootstrap5',
+    'django.contrib.postgres'
 ]
 
 MIDDLEWARE = [
@@ -65,7 +66,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
-                # 'app.views.common_context'
+                'app.context_processors.common_context',
             ],
         },
     },
@@ -135,3 +136,15 @@ MEDIA_URL = '/uploads/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login'
+
+CENTRIFUGO_SECRET="my_secret"
+CENTRIFUGO_WS_URL="ws://127.0.0.1:8010/connection/websocket"
+CENTRIFUGO_API_URL="http://127.0.0.1:8010/api"
+CENTRIFUGO_API_KEY="my_api_key"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}

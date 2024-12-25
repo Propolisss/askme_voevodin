@@ -14,5 +14,6 @@ urlpatterns = [
     path('logout', views.logout, name='logout'),
     path('question-like/<int:question_id>', views.question_like, name='question-like'),
     path('answer-like/<int:answer_id>', views.answer_like, name='answer-like'),
-    path('answer/<int:answer_id>', views.mark_answer, name='mark-answer')
+    path('answer/<int:answer_id>', views.mark_answer, name='mark-answer'),
+    path('search/<str:text>', views.search, name='search'),
 ]

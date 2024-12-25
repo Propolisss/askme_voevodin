@@ -10,13 +10,13 @@
 {% endblock %}
 
 {% block like-disabled %}
-    {% if request.user.profile.id in question.liked_profiles %}
+    {% if request.user.profile.id in question.liked_profiles or request.user.is_anonymous %}
         disabled
     {% endif %}
 {% endblock %}
 
 {% block dislike-disabled %}
-    {% if request.user.profile.id in question.disliked_profiles %}
+    {% if request.user.profile.id in question.disliked_profiles or request.user.is_anonymous %}
         disabled
     {% endif %}
 {% endblock %}
